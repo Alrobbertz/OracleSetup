@@ -1,9 +1,12 @@
+import java.io.*;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Scanner;
+
 
 public class OraclePipe {
 
-    private Connection connection;
+    Connection connection;
 
     public OraclePipe(){
         if((this.connection = connect()) == null){
@@ -156,8 +159,8 @@ public class OraclePipe {
             System.out.println("---CREATED TABLE---");
         } catch (SQLException e) {
             System.out.println("---FAILED TO CREATE TABLE---");
-            System.out.println(sql);
-            e.printStackTrace();
+            //System.out.println(sql);
+            //e.printStackTrace();
         }
     }
 
@@ -177,6 +180,30 @@ public class OraclePipe {
     public String[] parseSQLScript(String script) {
         String[] statements = script.split(";");
         return statements;
+
+    }
+
+    public static ArrayList<Node> getNodesFromCSV(String filePath) {
+        Reader file = null;
+        BufferedReader textReader = null;
+        ArrayList<Node> nodes = new ArrayList<>();
+        try {
+            file = new FileReader(filePath); // LOAD IN THE CSV FILE
+            textReader = new BufferedReader(file); // PUT IT IN  MEMORY BUFFER
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        try {
+            textReader.readLine(); // gets rid of the first line of header data
+            String nextLine;
+            while ((nextLine = textReader.readLine()) != null) {
+                Node next = Node.nodeFromCSV(nextLine);
+                nodes.add(next);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return nodes;
 
     }
 
