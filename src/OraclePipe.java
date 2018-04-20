@@ -57,11 +57,10 @@ public class OraclePipe {
         execute("DROP TABLE Edge");
         execute("DROP TABLE Permissions");
         execute("DROP TABLE Service");
-        execute("DROP TABLE Employee");
         execute("DROP TABLE Login");
         execute("DROP TABLE Manage");
         execute("DROP TABLE Node");
-
+        execute("DROP TABLE Employee");
     }
 
     public void createTables() {
@@ -78,8 +77,6 @@ public class OraclePipe {
                 " floor VARCHAR(10),\n" +
                 "  CONSTRAINT p_key_node PRIMARY KEY (nodeID));\n" +
                 "\n" +
-                "CREATE INDEX node_id_index ON Node(nodeID);\n" +
-                "\n" +
                 "CREATE TABLE Edge\n" +
                 "(edgeID\t\t\t\t\t\t VARCHAR(65),\n" +
                 " node_id_one \t\t\t VARCHAR(32),\n" +
@@ -88,17 +85,12 @@ public class OraclePipe {
                 "  CONSTRAINT f_key_node_one FOREIGN KEY (node_id_one) REFERENCES Node(nodeID),\n" +
                 "  CONSTRAINT f_key_node_two FOREIGN KEY (node_id_two) REFERENCES Node(nodeID));\n" +
                 "\n" +
-                "CREATE INDEX edge_id_index ON Edge(edgeID);\n" +
-                "\n" +
-                "\n" +
                 "CREATE TABLE Employee\n" +
                 "(employeeID\t\t\t\t VARCHAR(32),\n" +
                 " first_name\t\t\t\t VARCHAR(32),\n" +
                 " last_name  \t\t\t VARCHAR(32),\n" +
                 " title\t\t\t\t\t\t VARCHAR(32),\n" +
                 "  CONSTRAINT p_key_employee PRIMARY KEY (employeeID));\n" +
-                "\n" +
-                "CREATE INDEX employee_id_index ON Employee(employeeID);\n" +
                 "\n" +
                 "CREATE TABLE Login\n" +
                 "(employeeID VARCHAR(32),\n" +
@@ -107,8 +99,6 @@ public class OraclePipe {
                 " CONSTRAINT p_key_login PRIMARY KEY (employeeID),\n" +
                 " CONSTRAINT f_key_employee FOREIGN KEY (employeeID) REFERENCES Employee(employeeID));\n" +
                 "\n" +
-                "CREATE INDEX login_id_index ON Login(username, password);\n" +
-                "\n" +
                 "CREATE TABLE Manage\n" +
                 "(employeeID_Manager \tVARCHAR(32),\n" +
                 " employeeID_Employee  VARCHAR(32),\n" +
@@ -116,30 +106,39 @@ public class OraclePipe {
                 "  CONSTRAINT f_key_manage FOREIGN KEY (employeeID_Manager) REFERENCES Employee(employeeID),\n" +
                 "  CONSTRAINT f_key_manage2 FOREIGN KEY (employeeID_Employee) REFERENCES  Employee(employeeID));\n" +
                 "\n" +
-                "CREATE INDEX manager_id_index ON Manage(employeeID_Manager, employeeID_Employee);\n" +
-                "\n" +
                 "CREATE TABLE Permissions\n" +
                 "(employeeID\t\t\t\t VARCHAR(32),\n" +
                 " serviceType\t\t\t VARCHAR(32),\n" +
                 "  CONSTRAINT  f_key_permissions FOREIGN KEY  (employeeID) REFERENCES  Employee(employeeID),\n" +
                 "  CONSTRAINT  p_key_permissions PRIMARY KEY (employeeID, serviceType));\n" +
                 "\n" +
-                "CREATE INDEX permissions_emp_index ON Permissions(employeeID);\n" +
-                "\n" +
                 "CREATE TABLE Service\n" +
                 "(serviceID \t\t\t\tVARCHAR(32),\n" +
                 " kioskID\t\t\t\t\tVARCHAR(32),\n" +
-                " request_time\t\t\tTIMESTAMP,\n" +
+                " request_time\t\t\tDATE,\n" +
                 " serviceType\t\t\tVARCHAR(32),\n" +
                 " destinationNode  VARCHAR(32),\n" +
-                " completed\t\t\t\tBOOLEAN,\n" +
+                " completed\t\t\t\tNUMBER(1),\n" +
                 " assignedTo \t\t\tVARCHAR(32),\n" +
                 " hoursToComplete\tREAL,\n" +
                 " description\t\t\tVARCHAR(512),\n" +
                 " service_name     VARCHAR(32),\n" +
                 "  CONSTRAINT p_key_service PRIMARY KEY (serviceID),\n" +
-                "  CONSTRAINT f_key_service_node FOREIGN KEY (destinationNode) REFERENCES Node(nodeID));\n" +
-                "\n" +
+                "  CONSTRAINT f_key_service_node FOREIGN KEY (destinationNode) REFERENCES Node(nodeID));";
+        String[] statements = parseSQLScript(script);
+        for(String statement : statements) {
+            executeCreate(statement);
+
+        }
+    }
+
+    public void createIndexes(){
+        String script =   "CREATE INDEX node_id_index ON Node(nodeID);\n" +
+                "CREATE INDEX edge_id_index ON Edge(edgeID);\n" +
+                "CREATE INDEX employee_id_index ON Employee(employeeID);\n" +
+                "CREATE INDEX login_id_index ON Login(username, password);\n" +
+                "CREATE INDEX manager_id_index ON Manage(employeeID_Manager, employeeID_Employee);\n" +
+                "CREATE INDEX permissions_emp_index ON Permissions(employeeID);\n" +
                 "CREATE INDEX service_type_index ON Service(serviceType);\n" +
                 "CREATE INDEX service_assigned_index ON Service(assignedTo);";
         String[] statements = parseSQLScript(script);
@@ -152,11 +151,13 @@ public class OraclePipe {
     public void executeCreate(String sql) {
         try {
             Statement stmt = connection.createStatement();
-            stmt.executeUpdate(sql);
+            stmt.execute(sql);
             stmt.close();
             System.out.println("---CREATED TABLE---");
         } catch (SQLException e) {
             System.out.println("---FAILED TO CREATE TABLE---");
+            System.out.println(sql);
+            e.printStackTrace();
         }
     }
 
@@ -168,6 +169,7 @@ public class OraclePipe {
             stmt.close();
         } catch (SQLException e) {
             System.out.println("--- FAILED IN execute() ---");
+            System.out.println(sql);
             e.printStackTrace();
         }
     }
