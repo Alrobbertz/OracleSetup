@@ -56,14 +56,22 @@ public class OraclePipe {
         }
     }
 
-    public void dropTables() {
-        execute("DROP TABLE Edge");
-        execute("DROP TABLE Permissions");
-        execute("DROP TABLE Service");
-        execute("DROP TABLE Login");
-        execute("DROP TABLE Manage");
-        execute("DROP TABLE Node");
-        execute("DROP TABLE Employee");
+    public void dropEverything() {
+        execute("DROP TABLE Edge;");
+        execute("DROP TABLE Permissions;");
+        execute("DROP TABLE Service;");
+        execute("DROP TABLE Login;");
+        execute("DROP TABLE Manage;");
+        execute("DROP TABLE Node;");
+        execute("DROP TABLE Employee;");
+        execute("DROP INDEX node_id_index;");
+        execute("DROP INDEX edge_id_index;");
+        execute("DROP INDEX employee_id_index;");
+        execute("DROP INDEX login_id_index;");
+        execute("DROP INDEX manager_id_index;");
+        execute("DROP INDEX permissions_emp_index;");
+        execute("DROP INDEX service_type_index;");
+        execute("DROP INDEX service_assigned_index;");
     }
 
     public void createTables() {
