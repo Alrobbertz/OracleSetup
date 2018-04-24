@@ -207,7 +207,18 @@ public class Transaction {
     /////////////////////// HANDLE SERVICE ////////////////////////////////
 
     public void handleServiceInsert(Connection conn) {
-
+        try {
+            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM SERVICE WHERE SERVICEID = (?)");
+            stmt.setString(1, pkey_row);
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next()) {
+                Service s = new Service(rs);
+                System.out.println("Loaded New Service: " + s);
+            }
+        } catch (SQLException e) {
+            System.out.println("Issue inserting service, from materialized view call");
+            e.printStackTrace();
+        }
     }
 
     public void handleServiceDelete(Connection conn) {
