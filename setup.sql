@@ -20,6 +20,7 @@ DROP TABLE Login;
 DROP TABLE Manage;
 DROP TABLE Node;
 DROP TABLE Employee;
+DROP TABLE Mview;
 
 
 CREATE TABLE Node(
@@ -84,6 +85,18 @@ service_name     VARCHAR(32),
 CONSTRAINT p_key_service PRIMARY KEY (serviceID),
 CONSTRAINT f_key_service_node FOREIGN KEY (destinationNode) REFERENCES Node(nodeID));
 
+-- MATERIALED VIEW TABLE --
+CREATE TABLE MVIEW(
+transactionID RAW(16) DEFAULT sys_guid(),
+table_changed VARCHAR(32),
+update_performed VARCHAR(32),
+pkey_row VARCHAR(100),
+time_executed TIMESTAMP DEFAULT SYSTIMESTAMP,
+CONSTRAINT p_key_mview PRIMARY KEY (transactionID));
+
+CREATE OR REPLACE TRIGGER insert_edge
+BEFORE 
+
 -- CREATE INDEX node_id_index ON Node(nodeID); -- Doesnt work -- PK
 -- CREATE INDEX edge_id_index ON Edge(edgeID); -- Doesnt work -- PK
 -- CREATE INDEX employee_id_index ON Employee(employeeID); - Doesnt work -- PK
@@ -92,6 +105,7 @@ CREATE INDEX login_id_index ON Login(username, password);
 CREATE INDEX permissions_emp_index ON Permissions(employeeID);
 CREATE INDEX service_type_index ON Service(serviceType);
 CREATE INDEX service_assigned_index ON Service(assignedTo);
+
 
 
 /* Schemas
