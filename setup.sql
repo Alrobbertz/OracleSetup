@@ -85,7 +85,7 @@ service_name     VARCHAR(32),
 CONSTRAINT p_key_service PRIMARY KEY (serviceID),
 CONSTRAINT f_key_service_node FOREIGN KEY (destinationNode) REFERENCES Node(nodeID));
 
--- MATERIALED VIEW TABLE --
+-- MATERIALIZED VIEW TABLE --
 CREATE TABLE MVIEW(
 transactionID RAW(16) DEFAULT sys_guid(),
 table_changed VARCHAR(32),
@@ -94,8 +94,177 @@ pkey_row VARCHAR(100),
 time_executed TIMESTAMP DEFAULT SYSTIMESTAMP,
 CONSTRAINT p_key_mview PRIMARY KEY (transactionID));
 
+
+------------------------------------ START EDGE TRIGGEREDDDD ------------------------------------------
 CREATE OR REPLACE TRIGGER insert_edge
-BEFORE 
+AFTER INSERT
+  ON EDGE
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO MVIEW(table_changed, update_performed, pkey_row) VALUES ('edge', 'insert', :new.edgeID);
+  END;
+/
+
+CREATE OR REPLACE TRIGGER update_edge
+  AFTER UPDATE
+  ON EDGE
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO MVIEW(table_changed, update_performed, pkey_row) VALUES ('edge', 'update', :new.edgeID);
+  END;
+/
+
+CREATE OR REPLACE TRIGGER delete_edge
+  AFTER DELETE
+  ON EDGE
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO MVIEW(table_changed, update_performed, pkey_row) VALUES ('edge', 'delete', :old.edgeID);
+  END;
+/
+
+------------------------------------ START NODE TRIGGEREDDDD ------------------------------------------
+CREATE OR REPLACE TRIGGER insert_node
+  AFTER INSERT
+  ON NODE
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO MVIEW(table_changed, update_performed, pkey_row) VALUES ('node', 'insert', :new.nodeID);
+  END;
+/
+
+CREATE OR REPLACE TRIGGER update_node
+  AFTER UPDATE
+  ON NODE
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO MVIEW(table_changed, update_performed, pkey_row) VALUES ('node', 'update', :new.nodeID);
+  END;
+/
+
+CREATE OR REPLACE TRIGGER delete_node
+  AFTER DELETE
+  ON NODE
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO MVIEW(table_changed, update_performed, pkey_row) VALUES ('node', 'delete', :old.nodeID);
+  END;
+/
+
+
+------------------------------------ START EMPLOYEE TRIGGEREDDDD ------------------------------------------
+CREATE OR REPLACE TRIGGER insert_employee
+  AFTER INSERT
+  ON EMPLOYEE
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO MVIEW(table_changed, update_performed, pkey_row) VALUES ('employee', 'insert', :new.employeeID);
+  END;
+/
+
+CREATE OR REPLACE TRIGGER update_employee
+  AFTER UPDATE
+  ON EMPLOYEE
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO MVIEW(table_changed, update_performed, pkey_row) VALUES ('employee', 'update', :new.employeeID);
+  END;
+/
+
+CREATE OR REPLACE TRIGGER delete_employee
+  AFTER DELETE
+  ON EMPLOYEE
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO MVIEW(table_changed, update_performed, pkey_row) VALUES ('employee', 'delete', :old.employeeID);
+  END;
+/
+
+
+------------------------------------ START SERVICE TRIGGEREDDDD ------------------------------------------
+CREATE OR REPLACE TRIGGER insert_service
+  AFTER INSERT
+  ON SERVICE
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO MVIEW(table_changed, update_performed, pkey_row) VALUES ('service', 'insert', :new.serviceID);
+  END;
+/
+
+CREATE OR REPLACE TRIGGER update_service
+  AFTER UPDATE
+  ON SERVICE
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO MVIEW(table_changed, update_performed, pkey_row) VALUES ('service', 'update', :new.serviceID);
+  END;
+/
+
+CREATE OR REPLACE TRIGGER delete_service
+  AFTER DELETE
+  ON SERVICE
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO MVIEW(table_changed, update_performed, pkey_row) VALUES ('service', 'delete', :old.serviceID);
+  END;
+/
+
+------------------------------------ START MANAGE TRIGGEREDDDD ------------------------------------------
+CREATE OR REPLACE TRIGGER insert_manage
+  AFTER INSERT
+  ON MANAGE
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO MVIEW(table_changed, update_performed, pkey_row) VALUES ('manage', 'insert', :new.employeeID_Manager||'_'||:new.employeeID_Employee);
+  END;
+/
+
+CREATE OR REPLACE TRIGGER update_manage
+  AFTER UPDATE
+  ON MANAGE
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO MVIEW(table_changed, update_performed, pkey_row) VALUES ('manage', 'update', :new.employeeID_Manager||'_'||:new.employeeID_Employee);
+  END;
+/
+
+CREATE OR REPLACE TRIGGER delete_manage
+  AFTER DELETE
+  ON MANAGE
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO MVIEW(table_changed, update_performed, pkey_row) VALUES ('manage', 'delete', :old.employeeID_Manager||'_'||:old.employeeID_Employee);
+  END;
+/
+
+------------------------------------ START PERMISSIONS TRIGGEREDDDD ------------------------------------------
+CREATE OR REPLACE TRIGGER insert_permissions
+  AFTER INSERT
+  ON PERMISSIONS
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO MVIEW(table_changed, update_performed, pkey_row) VALUES ('permissions', 'insert', :new.employeeID||'_'||:new.serviceType);
+  END;
+/
+
+CREATE OR REPLACE TRIGGER update_permissions
+  AFTER UPDATE
+  ON PERMISSIONS
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO MVIEW(table_changed, update_performed, pkey_row) VALUES ('permissions', 'update', :new.employeeID||'_'||:new.serviceType);
+  END;
+/
+
+CREATE OR REPLACE TRIGGER delete_permissions
+  AFTER DELETE
+  ON PERMISSIONS
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO MVIEW(table_changed, update_performed, pkey_row) VALUES ('permissions', 'delete', :old.employeeID||'_'||:old.serviceType);
+  END;
+/
+
 
 -- CREATE INDEX node_id_index ON Node(nodeID); -- Doesnt work -- PK
 -- CREATE INDEX edge_id_index ON Edge(edgeID); -- Doesnt work -- PK
