@@ -27,7 +27,7 @@ public class DatabaseListener implements Runnable {
                 while (rs.next()) {
                     Transaction tempTrans = new Transaction(rs);
                     System.out.println(tempTrans.toString());
-                    tempTrans.handleTransaction(database.connection);
+                    tempTrans.handleTransaction(database);
                     max_transaction_timestamp = tempTrans.getTime_executed();
                 }
 

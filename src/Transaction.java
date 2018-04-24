@@ -15,30 +15,30 @@ public class Transaction {
         time_executed = rs.getTimestamp("time_executed");
     }
 
-    public void handleTransaction(Connection conn) {
+    public void handleTransaction(OraclePipe db) {
         switch(table_changed) {
             case "node" :
-                handleNode(conn);
+                handleNode(db);
                 break;
 
             case "edge" :
-                handleEdge(conn);
+                handleEdge(db);
                 break;
 
             case "service" :
-                handleService(conn);
+                handleService(db);
                 break;
 
             case "employee" :
-                handleEmployee(conn);
+                handleEmployee(db);
                 break;
 
             case "permission" :
-                handlePermissions(conn);
+                handlePermissions(db);
                 break;
 
             case "manage" :
-                handleManage(conn);
+                handleManage(db);
                 break;
 
             default :
@@ -47,64 +47,64 @@ public class Transaction {
         }
     }
 
-    public void handleNode(Connection conn) {
+    public void handleNode(OraclePipe db) {
         switch (update_performed) {
             case "insert" :
-                handleNodeInsert(conn);
+                handleNodeInsert(db);
                 break;
             case "update" :
-                handleNodeUpdate(conn);
+                handleNodeUpdate(db);
                 break;
             case "delete" :
-                handleNodeDelete(conn);
+                handleNodeDelete(db);
                 break;
             default:
                 System.out.println("What kinda update are you doing bro? " + update_performed +  "is not valid in this house");
         }
     }
 
-    public void handleEdge(Connection conn) {
+    public void handleEdge(OraclePipe db) {
         switch (update_performed) {
             case "insert" :
-                handleEdgeInsert(conn);
+                handleEdgeInsert(db);
                 break;
             case "update" :
-                handleEdgeUpdate(conn);
+                handleEdgeUpdate(db);
                 break;
             case "delete" :
-                handleEdgeDelete(conn);
+                handleEdgeDelete(db);
                 break;
             default:
                 System.out.println("What kinda update are you doing bro? " + update_performed + "is not valid in this house");
         }
     }
 
-    public void handleService(Connection conn) {
+    public void handleService(OraclePipe db) {
         switch (update_performed) {
             case "insert" :
-                handleServiceInsert(conn);
+                handleServiceInsert(db);
                 break;
             case "update" :
-                handleServiceUpdate(conn);
+                handleServiceUpdate(db);
                 break;
             case "delete" :
-                handleServiceDelete(conn);
+                handleServiceDelete(db);
                 break;
             default:
                 System.out.println("What kinda update are you doing bro? " + update_performed + "is not valid in this house");
         }
     }
 
-    public void handleEmployee(Connection conn) {
+    public void handleEmployee(OraclePipe db) {
         switch (update_performed) {
             case "insert" :
-                handleEmployeeInsert(conn);
+                handleEmployeeInsert(db);
                 break;
             case "update" :
-                handleEmployeeUpdate(conn);
+                handleEmployeeUpdate(db);
                 break;
             case "delete" :
-                handleEmployeeDelete(conn);
+                handleEmployeeDelete(db);
                 break;
             default:
                 System.out.println("What kinda update are you doing bro? " + update_performed +  "is not valid in this house");
@@ -112,32 +112,32 @@ public class Transaction {
 
     }
 
-    public void handlePermissions(Connection conn) {
+    public void handlePermissions(OraclePipe db) {
         switch (update_performed) {
             case "insert" :
-                handlePermissionInsert(conn);
+                handlePermissionInsert(db);
                 break;
             case "update" :
-                handlePermissionUpdate(conn);
+                handlePermissionUpdate(db);
                 break;
             case "delete" :
-                handlePermissionDelete(conn);
+                handlePermissionDelete(db);
                 break;
             default:
                 System.out.println("What kinda update are you doing bro? " + update_performed  + "is not valid in this house");
         }
     }
 
-    public void handleManage(Connection conn) {
+    public void handleManage(OraclePipe db) {
         switch (update_performed) {
             case "insert" :
-                handleManageInsert(conn);
+                handleManageInsert(db);
                 break;
             case "update" :
-                handleManageUpdate(conn);
+                handleManageUpdate(db);
                 break;
             case "delete" :
-                handleManageDelete(conn);
+                handleManageDelete(db);
                 break;
             default:
                 System.out.println("What kinda update are you doing bro? " + update_performed + "is not valid in this house");
@@ -146,15 +146,18 @@ public class Transaction {
 
     /////////////////////// HANDLE NODE ////////////////////////////////
 
-    public void handleNodeInsert(Connection conn) {
+    public void handleNodeInsert(OraclePipe db) {
         Node n;
         try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM NODE WHERE NODEID = (?)");
+            PreparedStatement stmt = db.connection.prepareStatement("SELECT * FROM NODE WHERE NODEID = (?)");
             stmt.setString(1, pkey_row);
             ResultSet rs = stmt.executeQuery();
             if(rs.next()) {
                 n = new Node(rs);
                 System.out.println("Loaded New Node: " + n);
+                n.setBeingEdited(true);
+                n.update(db);
+                //n.delete(db);
                 //Add to Map
                 //Attach Observers to it
                 //Notify
@@ -167,20 +170,20 @@ public class Transaction {
 
     }
 
-    public void handleNodeDelete(Connection conn) {
+    public void handleNodeDelete(OraclePipe db) {
 
     }
 
-    public void handleNodeUpdate(Connection conn) {
+    public void handleNodeUpdate(OraclePipe db) {
 
     }
 
     /////////////////////// HANDLE EDGE ////////////////////////////////
 
-    public void handleEdgeInsert(Connection conn) {
+    public void handleEdgeInsert(OraclePipe db) {
         Edge edge;
         try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM EDGE WHERE EDGEID = (?)");
+            PreparedStatement stmt = db.connection.prepareStatement("SELECT * FROM EDGE WHERE EDGEID = (?)");
             stmt.setString(1, pkey_row);
             ResultSet rs = stmt.executeQuery();
             if(rs.next()) {
@@ -196,78 +199,78 @@ public class Transaction {
         }
     }
 
-    public void handleEdgeDelete(Connection conn) {
+    public void handleEdgeDelete(OraclePipe db) {
 
     }
 
-    public void handleEdgeUpdate(Connection conn) {
+    public void handleEdgeUpdate(OraclePipe db) {
 
     }
 
     /////////////////////// HANDLE SERVICE ////////////////////////////////
 
-    public void handleServiceInsert(Connection conn) {
-        try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM SERVICE WHERE SERVICEID = (?)");
-            stmt.setString(1, pkey_row);
-            ResultSet rs = stmt.executeQuery();
-            if(rs.next()) {
-                Service s = new Service(rs);
-                System.out.println("Loaded New Service: " + s);
-            }
-        } catch (SQLException e) {
-            System.out.println("Issue inserting service, from materialized view call");
-            e.printStackTrace();
-        }
+    public void handleServiceInsert(OraclePipe db) {
+//        try {
+//            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM SERVICE WHERE SERVICEID = (?)");
+//            stmt.setString(1, pkey_row);
+//            ResultSet rs = stmt.executeQuery();
+//            if(rs.next()) {
+//                Service s = new Service(rs);
+//                System.out.println("Loaded New Service: " + s);
+//            }
+//        } catch (SQLException e) {
+//            System.out.println("Issue inserting service, from materialized view call");
+//            e.printStackTrace();
+//        }
     }
 
-    public void handleServiceDelete(Connection conn) {
+    public void handleServiceDelete(OraclePipe db) {
 
     }
 
-    public void handleServiceUpdate(Connection conn) {
+    public void handleServiceUpdate(OraclePipe db) {
 
     }
 
     /////////////////////// HANDLE EMPLOYEE  ////////////////////////////////
 
-    public void handleEmployeeInsert(Connection conn) {
+    public void handleEmployeeInsert(OraclePipe db) {
 
     }
 
-    public void handleEmployeeDelete(Connection conn) {
+    public void handleEmployeeDelete(OraclePipe db) {
 
     }
 
-    public void handleEmployeeUpdate(Connection conn) {
+    public void handleEmployeeUpdate(OraclePipe db) {
 
     }
 
     /////////////////////// HANDLE PERMISSION  ////////////////////////////////
 
-    public void handlePermissionInsert(Connection conn) {
+    public void handlePermissionInsert(OraclePipe db) {
 
     }
 
-    public void handlePermissionDelete(Connection conn) {
+    public void handlePermissionDelete(OraclePipe db) {
 
     }
 
-    public void handlePermissionUpdate(Connection conn) {
+    public void handlePermissionUpdate(OraclePipe db) {
 
     }
 
     /////////////////////// HANDLE MANAGE ////////////////////////////////
 
-    public void handleManageInsert(Connection conn) {
+    public void handleManageInsert(OraclePipe db) {
 
     }
 
-    public void handleManageDelete(Connection conn) {
+    public void handleManageDelete(OraclePipe db) {
 
     }
 
-    public void handleManageUpdate(Connection conn) {
+    public void handleManageUpdate(OraclePipe db) {
 
     }
 

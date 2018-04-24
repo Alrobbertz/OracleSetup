@@ -34,6 +34,7 @@ CREATE TABLE Node(
   nodeType CHAR(4),
   building VARCHAR(255),
   floor VARCHAR(10),
+  isBeingEdited NUMBER(1),
   CONSTRAINT p_key_node PRIMARY KEY (nodeID));
 
 CREATE TABLE Edge(

@@ -23,6 +23,7 @@ public class Node {
 	private double pureweight = 10000;
 	private int floornumber;
 	private int timesvisited = 0;
+	private boolean isBeingEdited;
 	/**
 	 * Constructor
 	 * @param node_id 10-Character ID, has specific nomencalutre
@@ -81,6 +82,7 @@ public class Node {
 			this.node_type = rs.getString("nodeType");
 			this.building = rs.getString("building");
 			this.floor = rs.getString("floor");
+			this.isBeingEdited = rs.getBoolean("isBeingEdited");
 			this.edges = new ArrayList<>();
 			this.neighbors = new ArrayList<>();
 		} catch (SQLException e) {
@@ -146,7 +148,7 @@ public class Node {
 		}
 	}
 
-	public void deleteEdges( OraclePipe database) {
+	public void deleteEdges(OraclePipe database) {
 		try {
 			PreparedStatement stmt = database.connection.prepareStatement("SELECT * FROM EDGE WHERE NODE_ID_ONE = (?) OR NODE_ID_TWO = (?)");
 			stmt.setString(1, getNode_id());
@@ -209,7 +211,7 @@ public class Node {
 	public void insert( OraclePipe database) {
 		System.out.println("node inserted");
 		try {
-			PreparedStatement stmt = database.connection.prepareStatement("INSERT INTO NODE VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+			PreparedStatement stmt = database.connection.prepareStatement("INSERT INTO NODE VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			stmt.setString(1, node_id);
 			stmt.setString(2, long_name);
 			stmt.setString(3, short_name);
@@ -220,6 +222,7 @@ public class Node {
 			stmt.setString(8, node_type);
 			stmt.setString(9, building);
 			stmt.setString(10, floor);
+			stmt.setBoolean(11, isBeingEdited);
 			stmt.executeUpdate();
 			database.connection.commit();
 			stmt.close();
@@ -246,7 +249,7 @@ public class Node {
 		try {
 			PreparedStatement stmt = database.connection.prepareStatement("UPDATE Node SET NODEID = (?), LONGNAME = (?), SHORTNAME = (?), \n" +
 					"COORDX2D = (?), COORDY2D = (?), COORDX3D = (?), COORDY3D = (?),\n" +
-					"NODETYPE = (?), BUILDING = (?), FLOOR = (?) WHERE NODEID = (?)");
+					"NODETYPE = (?), BUILDING = (?), FLOOR = (?), ISBEINGEDITED = (?) WHERE NODEID = (?)");
 			stmt.setString(1, node_id);
 			stmt.setString(2, long_name);
 			stmt.setString(3, short_name);
@@ -257,7 +260,8 @@ public class Node {
 			stmt.setString(8, node_type);
 			stmt.setString(9, building);
 			stmt.setString(10, floor);
-			stmt.setString(11, node_id);
+			stmt.setBoolean(11, isBeingEdited);
+			stmt.setString(12, node_id);
 			stmt.executeUpdate();
 			stmt.close();
 		} catch (SQLException e) {
@@ -501,8 +505,15 @@ public class Node {
 
 	}
 
+    public boolean isBeingEdited() {
+        return isBeingEdited;
+    }
 
-	@Override
+    public void setBeingEdited(boolean beingEdited) {
+        isBeingEdited = beingEdited;
+    }
+
+    @Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
