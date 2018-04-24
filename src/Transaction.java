@@ -148,13 +148,17 @@ public class Transaction {
     /////////////////////// HANDLE NODE ////////////////////////////////
 
     public void handleNodeInsert(Connection conn) {
+        Node n;
         try {
             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM NODE WHERE NODEID = (?)");
             stmt.setString(1, pkey_row);
             ResultSet rs = stmt.executeQuery();
             if(rs.next()) {
-                Node n = new Node(rs);
+                n = new Node(rs);
                 System.out.println("Loaded New Node: " + n);
+                //Add to Map
+                //Attach Observers to it
+                //Notify
             }
         } catch (SQLException e) {
             System.out.println("Issue inserting node, from materialized view call");
@@ -174,7 +178,22 @@ public class Transaction {
     /////////////////////// HANDLE EDGE ////////////////////////////////
 
     public void handleEdgeInsert(Connection conn) {
-
+        Edge edge;
+        try {
+            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM EDGE WHERE EDGEID = (?)");
+            stmt.setString(1, pkey_row);
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next()) {
+                edge = new Edge(rs);
+                System.out.println("Loaded New Edge: " + edge);
+                //Add to Map
+                //Attach Observers to it
+                //Notify
+            }
+        } catch (SQLException e) {
+            System.out.println("Issue inserting node, from materialized view call");
+            e.printStackTrace();
+        }
     }
 
     public void handleEdgeDelete(Connection conn) {
