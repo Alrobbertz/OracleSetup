@@ -13,7 +13,6 @@ public class Transaction {
         update_performed = rs.getString("update_performed");
         pkey_row = rs.getString("pkey_row");
         time_executed = rs.getTimestamp("time_executed");
-
     }
 
     public void handleTransaction(Connection conn) {
@@ -160,6 +159,7 @@ public class Transaction {
                 //Attach Observers to it
                 //Notify
             }
+            rs.close();
         } catch (SQLException e) {
             System.out.println("Issue inserting node, from materialized view call");
             e.printStackTrace();
