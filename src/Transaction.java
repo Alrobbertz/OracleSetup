@@ -1,6 +1,4 @@
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 
 public class Transaction {
     private String transactionID;
@@ -18,30 +16,30 @@ public class Transaction {
 
     }
 
-    public void handleTransaction() {
+    public void handleTransaction(Connection conn) {
         switch(table_changed) {
             case "node" :
-                handleNode();
+                handleNode(conn);
                 break;
 
             case "edge" :
-                handleEdge();
+                handleEdge(conn);
                 break;
 
             case "service" :
-                handleService();
+                handleService(conn);
                 break;
 
             case "employee" :
-                handleEmployee();
+                handleEmployee(conn);
                 break;
 
             case "permission" :
-                handlePermissions();
+                handlePermissions(conn);
                 break;
 
             case "manage" :
-                handleManage();
+                handleManage(conn);
                 break;
 
             default :
@@ -50,64 +48,64 @@ public class Transaction {
         }
     }
 
-    public void handleNode() {
+    public void handleNode(Connection conn) {
         switch (update_performed) {
             case "insert" :
-                handleNodeInsert();
+                handleNodeInsert(conn);
                 break;
             case "update" :
-                handleNodeUpdate();
+                handleNodeUpdate(conn);
                 break;
             case "delete" :
-                handleNodeDelete();
+                handleNodeDelete(conn);
                 break;
             default:
                 System.out.println("What kinda update are you doing bro? " + update_performed +  "is not valid in this house");
         }
     }
 
-    public void handleEdge() {
+    public void handleEdge(Connection conn) {
         switch (update_performed) {
             case "insert" :
-                handleEdgeInsert();
+                handleEdgeInsert(conn);
                 break;
             case "update" :
-                handleEdgeUpdate();
+                handleEdgeUpdate(conn);
                 break;
             case "delete" :
-                handleEdgeDelete();
+                handleEdgeDelete(conn);
                 break;
             default:
                 System.out.println("What kinda update are you doing bro? " + update_performed + "is not valid in this house");
         }
     }
 
-    public void handleService() {
+    public void handleService(Connection conn) {
         switch (update_performed) {
             case "insert" :
-                handleServiceInsert();
+                handleServiceInsert(conn);
                 break;
             case "update" :
-                handleServiceUpdate();
+                handleServiceUpdate(conn);
                 break;
             case "delete" :
-                handleServiceDelete();
+                handleServiceDelete(conn);
                 break;
             default:
                 System.out.println("What kinda update are you doing bro? " + update_performed + "is not valid in this house");
         }
     }
 
-    public void handleEmployee() {
+    public void handleEmployee(Connection conn) {
         switch (update_performed) {
             case "insert" :
-                handleEmployeeInsert();
+                handleEmployeeInsert(conn);
                 break;
             case "update" :
-                handleEmployeeUpdate();
+                handleEmployeeUpdate(conn);
                 break;
             case "delete" :
-                handleEmployeeDelete();
+                handleEmployeeDelete(conn);
                 break;
             default:
                 System.out.println("What kinda update are you doing bro? " + update_performed +  "is not valid in this house");
@@ -115,32 +113,32 @@ public class Transaction {
 
     }
 
-    public void handlePermissions() {
+    public void handlePermissions(Connection conn) {
         switch (update_performed) {
             case "insert" :
-                handlePermissionInsert();
+                handlePermissionInsert(conn);
                 break;
             case "update" :
-                handlePermissionUpdate();
+                handlePermissionUpdate(conn);
                 break;
             case "delete" :
-                handlePermissionDelete();
+                handlePermissionDelete(conn);
                 break;
             default:
                 System.out.println("What kinda update are you doing bro? " + update_performed  + "is not valid in this house");
         }
     }
 
-    public void handleManage() {
+    public void handleManage(Connection conn) {
         switch (update_performed) {
             case "insert" :
-                handleManageInsert();
+                handleManageInsert(conn);
                 break;
             case "update" :
-                handleManageUpdate();
+                handleManageUpdate(conn);
                 break;
             case "delete" :
-                handleManageDelete();
+                handleManageDelete(conn);
                 break;
             default:
                 System.out.println("What kinda update are you doing bro? " + update_performed + "is not valid in this house");
@@ -149,85 +147,97 @@ public class Transaction {
 
     /////////////////////// HANDLE NODE ////////////////////////////////
 
-    public void handleNodeInsert() {
+    public void handleNodeInsert(Connection conn) {
+        try {
+            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM NODE WHERE NODEID = (?)");
+            stmt.setString(1, pkey_row);
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next()) {
+                Node n = new Node(rs);
+                System.out.println("Loaded New Node: " + n);
+            }
+        } catch (SQLException e) {
+            System.out.println("Issue inserting node, from materialized view call");
+            e.printStackTrace();
+        }
 
     }
 
-    public void handleNodeDelete() {
+    public void handleNodeDelete(Connection conn) {
 
     }
 
-    public void handleNodeUpdate() {
+    public void handleNodeUpdate(Connection conn) {
 
     }
 
     /////////////////////// HANDLE EDGE ////////////////////////////////
 
-    public void handleEdgeInsert() {
+    public void handleEdgeInsert(Connection conn) {
 
     }
 
-    public void handleEdgeDelete() {
+    public void handleEdgeDelete(Connection conn) {
 
     }
 
-    public void handleEdgeUpdate() {
+    public void handleEdgeUpdate(Connection conn) {
 
     }
 
     /////////////////////// HANDLE SERVICE ////////////////////////////////
 
-    public void handleServiceInsert() {
+    public void handleServiceInsert(Connection conn) {
 
     }
 
-    public void handleServiceDelete() {
+    public void handleServiceDelete(Connection conn) {
 
     }
 
-    public void handleServiceUpdate() {
+    public void handleServiceUpdate(Connection conn) {
 
     }
 
     /////////////////////// HANDLE EMPLOYEE  ////////////////////////////////
 
-    public void handleEmployeeInsert() {
+    public void handleEmployeeInsert(Connection conn) {
 
     }
 
-    public void handleEmployeeDelete() {
+    public void handleEmployeeDelete(Connection conn) {
 
     }
 
-    public void handleEmployeeUpdate() {
+    public void handleEmployeeUpdate(Connection conn) {
 
     }
 
     /////////////////////// HANDLE PERMISSION  ////////////////////////////////
 
-    public void handlePermissionInsert() {
+    public void handlePermissionInsert(Connection conn) {
 
     }
 
-    public void handlePermissionDelete() {
+    public void handlePermissionDelete(Connection conn) {
 
     }
 
-    public void handlePermissionUpdate() {
+    public void handlePermissionUpdate(Connection conn) {
 
     }
 
     /////////////////////// HANDLE MANAGE ////////////////////////////////
 
-    public void handleManageInsert() {
+    public void handleManageInsert(Connection conn) {
 
     }
 
-    public void handleManageDelete() {
+    public void handleManageDelete(Connection conn) {
 
     }
 
-    public void handleManageUpdate() {
+    public void handleManageUpdate(Connection conn) {
 
     }
 
@@ -269,5 +279,12 @@ public class Transaction {
 
     public void setTime_executed(Timestamp time_executed) {
         this.time_executed = time_executed;
+    }
+
+    public String toString() {
+        String temp = "";
+        temp += "TransactionID: [" + transactionID + "] TABLE: [" + table_changed + "] CHANGE: [" + update_performed +
+                "] PKEY: [" + pkey_row + "]";
+        return temp;
     }
 }
